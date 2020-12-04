@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_test.c                               :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aldamien <aldamien@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 16:22:23 by aldamien          #+#    #+#             */
-/*   Updated: 2020/12/04 16:35:32 by aldamien         ###   ########.fr       */
+/*   Updated: 2020/12/04 18:33:43 by aldamien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,20 @@ void	get_next_line2(char *buf, char **tmp, char **chain)
 
 int		get_next_line(int fd, char **line)
 {
-	char		*buf;
+	if (BUFFER_SIZE <= 0)
+		return(-1);
+	else
+		return (get_next_line1(fd, line));
+}
+
+int		get_next_line1(int fd, char **line)
+{
+	static char	buf[BUFFER_SIZE + 1];
 	static char	*chain;
 	int			ret;
 	char		*tmp;
 
-	if (fd == -1 || !line || !(buf = malloc(sizeof(char) * BUFFER_SIZE + 1))
-		|| read(fd, buf, 0) == -1 || BUFFER_SIZE <= 0)
+	if (fd == -1 || !line || read(fd, buf, 0) == -1 || BUFFER_SIZE <= 0)
 		return (-1);
 	while ((ret = read(fd, buf, BUFFER_SIZE)) > 0 || chain[0] != '\0')
 	{
@@ -54,33 +61,5 @@ int		get_next_line(int fd, char **line)
 			break ;
 		}
 	}
-	free(buf);
 	return (ret);
-}
-
-int		main()
-{
-	int		fd;
-	char	*line;
-	int		i;
-	int		ret;
-
-	i = 1;
-	fd = open("42", O_RDONLY);
-	if (fd == -1)
-	{
-		printf("open() error");
-		return (1);
-	}
-	while (i <= 4)
-	{
-		i++;
-		ret = get_next_line(fd, &line);
-		if (ret >= 0)
-		{
-			printf("line externe : %s\n\n", line);
-			free(line);
-		}
-	}
-	close (fd);
 }
